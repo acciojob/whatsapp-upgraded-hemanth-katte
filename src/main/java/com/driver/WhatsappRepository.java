@@ -50,10 +50,10 @@ public class WhatsappRepository {
             groupUsersDB.put(group, users);
             return group;
         }
-        this.groupCount += 1;
+
         Group group = new Group(new String("Group "+this.groupCount), users.size());
         adminDB.put(group, users.get(0));
-
+        this.groupCount += 1;
         groupMessagesBD.put(group, new ArrayList<Message>());
 
         groupUsersDB.put(group, users);
@@ -115,7 +115,7 @@ public class WhatsappRepository {
 
                 if(userExists){
                     adminDB.put(group, user);
-                    return "SUCCESS";
+                    return "Successfully updated";
                 }
                 throw new Exception("User is not member");
             }
@@ -125,10 +125,65 @@ public class WhatsappRepository {
     }
 
     public int removeUser(User user) throws Exception{
-        return 0;
+
+        Boolean userExists = false;
+        Group userGroup = null;
+        for(Group group: groupUsersDB.keySet()){
+            List<User> participants = groupUsersDB.get(group);
+            for(User participant: participants){
+                if(participant.equals(user)){
+                    if(adminDB.get(group).equals(user)){
+                        throw new Exception("Cannot remove admin");
+                    }
+                    userGroup = group;
+                    userExists = true;
+                    break;
+                }
+            }
+
+            if(userExists){
+                break;
+            }
+        }
+
+        if(userExists){
+            List<User> users = groupUsersDB.get(userGroup);
+
+            List<User> updatedUsers = new ArrayList<>();
+
+            for(User participant: users){
+
+                if(participant.equals(user))
+                    continue;
+                updatedUsers.add(participant);
+            }
+            groupUsersDB.put(userGroup, updatedUsers);
+
+
+            List<Message> messages = groupMessagesBD.get(userGroup);
+            List<Message> updatedMessages = new ArrayList<>();
+            for(Message message: messages){
+
+                if(senderDB.get(message).equals(user))
+                    continue;
+                updatedMessages.add(message);
+            }
+            groupMessagesBD.put(userGroup, updatedMessages);
+
+
+            HashMap<Message, User> updatedSenderMap = new HashMap<>();
+            for(Message message: senderDB.keySet()){
+                if(senderDB.get(message).equals(user))
+                    continue;
+                updatedSenderMap.put(message, senderDB.get(message));
+            }
+            senderDB = updatedSenderMap;
+            return updatedUsers.size()+updatedMessages.size()+updatedSenderMap.size();
+        }
+
+
+        throw new Exception("User not found");
     }
-
-
-
-
 }
+
+
