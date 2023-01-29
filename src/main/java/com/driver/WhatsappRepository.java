@@ -50,10 +50,10 @@ public class WhatsappRepository {
             groupUsersDB.put(group, users);
             return group;
         }
-
+        this.groupCount += 1;
         Group group = new Group(new String("Group "+this.groupCount), users.size());
         adminDB.put(group, users.get(0));
-        this.groupCount += 1;
+
         groupMessagesBD.put(group, new ArrayList<Message>());
 
         groupUsersDB.put(group, users);
