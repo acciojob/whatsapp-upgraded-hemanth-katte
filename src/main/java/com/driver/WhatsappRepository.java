@@ -31,11 +31,11 @@ public class WhatsappRepository {
     public String createUser(String name, String mobile) throws Exception {
 
         if(userMobileDB.contains(mobile)){
-            throw new Exception("User already present in DB");
+            throw new Exception("User already exists");
         }
         userMobileDB.add(mobile);
         User user = new User(name, mobile);
-        return "New User Created";
+        return "SUCCESS";
     }
 
     public Group createGroup(List<User> users){
@@ -93,7 +93,7 @@ public class WhatsappRepository {
                 groupMessagesBD.put(group, messages);
                 return messages.size();
             }
-            throw new Exception("User not part of group");
+            throw new Exception("You are not allowed to send message");
         }
         throw new Exception("Group does not exist");
     }
@@ -115,11 +115,11 @@ public class WhatsappRepository {
 
                 if(userExists){
                     adminDB.put(group, user);
-                    return "Successfully updated";
+                    return "SUCCESS";
                 }
-                throw new Exception("User is not member");
+                throw new Exception("User is not a participant");
             }
-            throw new Exception("Approver can't approve");
+            throw new Exception("Approver does not have rights");
         }
         throw new Exception("Group does not exist");
     }
